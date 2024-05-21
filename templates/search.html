@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <!-- Add any additional CSS or styling here -->
+</head>
+<body>
+    <h1>Search Results</h1>
+
+    {% if movies %}
+        <ul>
+            {% for movie in movies %}
+                <li>
+                    <h2>{{ movie.title }}</h2>
+                    <p>Description: {{ movie.description }}</p>
+                    <p>Genre: {{ movie.genre }}</p>
+                    <!-- Add more details about the movie as needed -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+
+    <!-- Add any additional HTML or elements here -->
+
+    <!-- Add any additional JavaScript or scripts here -->
+</body>
+</html>

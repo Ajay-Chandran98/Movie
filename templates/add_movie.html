@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Movie</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'addmovie.css' %}" />
+</head>
+<body class="text-white bg-gray-900">
+<main class="container mx-auto py-10">
+    <div class="container-wrapper">
+        <div class="add-movie-form bg-gray-800 rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold mb-4">Add a New Movie</h1>
+            <form action="{% url 'film:add_movie' %}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div>
+                    {{ form.title.label_tag }}
+                    {{ form.title }}
+                </div>
+                <div>
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                </div>
+                <div>
+                    {{ form.release_date.label_tag }}
+                    {{ form.release_date }}
+                </div>
+                <div>
+                    {{ form.category.label_tag }}
+                    {{ form.category }}
+                </div>
+                <div>
+                    <label for="id_poster">Poster:</label>
+                    <input type="file" name="poster" accept="image/*" required id="id_poster">
+                </div>
+                <div>
+                    {{ form.trailer_link.label_tag }}
+                    {{ form.trailer_link }}
+                </div>
+                <div>
+                    {{ form.actors.label_tag }}
+                    {{ form.actors }}
+                </div>
+                <button type="submit" class="bg-blue-600 text-dark py-2 px-6 rounded-lg mt-4 hover:bg-blue-500">Add Movie</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

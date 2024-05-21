@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovFlix</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/style.css' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <header class="p-5 flex justify-between items-center bg-gray-800 shadow-lg">
+        <span class="text-2xl font-extrabold tracking-wide">MovFlix</span>
+        <nav class="flex space-x-5 items-center">
+            <a href="/" class="nav-link text-lg hover:text-gray-400">Home</a>
+            <a href="/my-list" class="nav-link text-lg hover:text-gray-400">My List</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'film:add_movie' %}" class="nav-link text-lg hover:text-gray-400">Add Movie</a>
+            {% else %}
+                <a href="{% url 'login' %}?next={% url 'film:add_movie' %}" class="nav-link text-lg hover:text-gray-400">Add Movie</a>
+            {% endif %}
+            <div class="relative">
+                <span id="dropdownMenuButton" class="cursor-pointer text-lg hover:text-gray-400">Category ▼</span>
+                <div id="dropdownMenu" class="absolute left-0 mt-2 w-48 bg-gray-700 rounded-lg shadow-lg hidden">
+                    {% for category in categories %}
+                        <a href="{% url 'film:category_movies' category.name %}" class="block px-4 py-2 hover:bg-gray-600">{{ category.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </nav>
+        <form action="{% url 'search_results' %}" method="GET" class="flex items-center">
+            <div class="relative">
+                <input type="text" name="query" placeholder="Search movies" class="bg-gray-700 text-white rounded-full py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="absolute right-0 top-0 mt-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l5-5m0 0l-5-5m5 5H4"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+        <div class="flex space-x-5 items-center">
+            {% if user.is_authenticated %}
+                <div class="relative">
+                    <span class="block p-2">Welcome, {{ user.username }}</span>
+                    <a href="/logout" class="block p-2 text-red-500 hover:text-red-400">Logout</a>
+                </div>
+            {% else %}
+                <a href="/login" class="block p-2 hover:text-gray-400">Login</a>
+                <a href="/signup" class="block p-2 hover:text-gray-400">Signup</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <section class="py-10 px-5">
+        <h2 class="text-3xl mb-8 font-semibold">Movies</h2>
+        <div class="flex space-x-5 overflow-x-auto scrollbar-hide">
+            {% for movie in movies %}
+                <a href="/movie/{{ movie.id }}" class="group">
+                    <div class="w-40 h-64 flex-shrink-0 relative transform transition-transform duration-300 hover:scale-105">
+                        <img src="{{ movie.poster.url }}" alt="{{ movie.title }} Poster" class="w-full h-full object-cover rounded-lg shadow-md">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-center px-2">{{ movie.title }}</span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <script>
+        $(document).ready(function() {
+            $('#dropdownMenuButton').click(function() {
+                $('#dropdownMenu').toggleClass('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

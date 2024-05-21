@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My List - MovFlix</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/style.css' %}" />
+</head>
+
+<body class="text-white" style="background-color: #141414;">
+    <header class="p-5 flex justify-between items-center bg-gray-900 text-white">
+        <span class="text-xl font-bold">MovFlix</span>
+        <nav class="flex space-x-5">
+            <a href="/" class="nav-link">Home</a>
+            <a href="{% url 'film:my_list' %}" class="nav-link">My List</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'film:add_movie' %}" class="nav-link">Add Movie</a>
+            {% else %}
+            <a href="{% url 'login' %}?next={% url 'film:add_movie' %}" class="nav-link">Add Movie</a>
+            {% endif %}
+
+        </nav>
+        <form action="{% url 'search_results' %}" method="GET" class="flex items-center">
+            <div class="relative">
+                <input type="text" name="query" placeholder="Search movies" class="bg-gray-800 text-white rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="absolute right-0 top-0 mt-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l5-5m0 0l-5-5m5 5H4"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+        <div class="flex space-x-5 items-center">
+            {% if user.is_authenticated %}
+            <div class="relative">
+                <a href="profile.html" class="block p-2">Welcome, {{ user.username }}</a>
+                <a href="/logout" class="block p-2">Logout</a>
+            </div>
+            {% else %}
+            <a href="/login" class="block p-2">Login</a>
+            <a href="/signup" class="block p-2">Signup</a>
+            {% endif %}
+        </div>
+    </header>
+    <section class="py-10 px-5">
+        <h1 class="text-3xl mb-5">My List</h1>
+        {% if my_list_movies %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for movie in my_list_movies %}
+            <div class="movie-item bg-gray-700 p-4 rounded-lg shadow-lg">
+                <h2 class="movie-title text-xl font-bold mb-2">{{ movie.title }}</h2>
+                <div class="movie-poster mb-4">
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="rounded-lg">
+                </div>
+                <a href="{% url 'film:movie_detail' movie.id %}" class="text-blue-500 hover:underline">View Details</a>
+                <form action="{% url 'film:remove_from_list' movie.id %}" method="POST" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500">Remove</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-lg">You have not added any movies to your list yet.</p>
+        {% endif %}
+    </section>
+</body>
+
+</html>

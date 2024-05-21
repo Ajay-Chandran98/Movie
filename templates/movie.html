@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'movie.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/style.css' %}" />
+</head>
+<body class="text-white bg-gray-900">
+<main class="container mx-auto py-10">
+    <div class="container-wrapper">
+        <h1 class="movie-title text-4xl font-bold mb-6 text-center text-gray-900">{{ movie.title }}</h1>
+<div class="movie-poster flex justify-center mb-8">
+    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="rounded-lg shadow-2xl max-w-full h-auto">
+</div>
+<div class="movie-details container mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <p class="movie-description text-xl mb-4"><strong>Description:</strong> {{ movie.description }}</p>
+    <p class="movie-release-date text-xl mb-4"><strong>Release Date:</strong> {{ movie.release_date }}</p>
+    <p class="movie-category text-xl mb-4"><strong>Category:</strong> {{ movie.category }}</p>
+    <p class="movie-length text-xl mb-4"><strong>Length:</strong> {{ movie.length }} minutes</p>
+
+    {% if movie.trailer_link %}
+        <div class="trailer-link-box bg-blue-700 p-4 rounded-lg mb-6 text-center">
+            <a href="{{ movie.trailer_link }}" target="_blank" class="inline-block text-white font-bold text-lg">Watch Trailer</a>
+        </div>
+    {% endif %}
+
+    {% if movie.actors %}
+        <p class="movie-actors text-xl mb-4"><strong>Actors:</strong> {{ movie.actors }}</p>
+    {% endif %}
+    <p class="movie-views text-xl mb-4"><strong>Views:</strong> {{ movie.movie_views }}</p>
+
+    <!-- Average Rating -->
+    {% if average_rating %}
+        <p class="movie-average-rating text-xl mb-4"><strong>Average Rating:</strong> {{ average_rating|floatformat:1 }} / 10</p>
+    {% else %}
+        <p class="movie-average-rating text-xl mb-4"><strong>Average Rating:</strong> Not rated yet</p>
+    {% endif %}
+
+    <!-- User Rating -->
+    {% if user_rating %}
+        <p class="user-rating text-xl mb-4"><strong>Your Rating:</strong> {{ user_rating.rating }} / 10</p>
+    {% endif %}
+
+    <!-- Rating Form -->
+    <form action="{% url 'film:rate_movie' movie.id %}" method="POST" class="rating-form mb-6">
+        {% csrf_token %}
+        <label for="rating" class="block mb-2 text-lg">Your Rating (out of 10):</label>
+        <input type="number" id="rating" name="rating" min="1" max="10" step="1" class="rating-input w-24 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-black" required>
+        <button type="submit" class="rating-submit bg-blue-600 text-white py-2 px-6 rounded-lg mt-4 hover:bg-blue-500">Submit Rating</button>
+    </form>
+
+    <!-- Comment Form -->
+    <form action="{% url 'film:command_movie' movie.id %}" method="POST" class="comment-form mb-6">
+        {% csrf_token %}
+        <label for="comment" class="block mb-2 text-lg">Your Comment:</label>
+        <textarea id="comment" name="comment" required class="comment-textarea w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" style="color: black;"></textarea>
+        <button type="submit" class="comment-submit bg-red-600 text-white py-2 px-6 rounded-lg mt-4 hover:bg-red-500">Submit Comment</button>
+    </form>
+
+    <form action="{% url 'film:add_to_list' movie.id %}" method="POST" class="add-to-list-form mb-6">
+        {% csrf_token %}
+        <button type="submit" class="add-to-list-submit bg-green-600 text-white py-2 px-6 rounded-lg mt-4 hover:bg-green-500">Add to My List</button>
+    </form>
+
+    <!-- Display Comments -->
+    <h2 class="comments-title text-3xl font-bold mb-4 text-gray-300">Comments:</h2>
+    <ul class="comments-list space-y-4">
+        {% for comment in comments %}
+            <li class="comment-item bg-gray-100 p-4 rounded-lg shadow-lg" style="color: black;">
+        <strong class="text-gray-900">{{ comment.user.username }}</strong>:
+        <span style="color:black">{{ comment.text }}</span>
+        <span class="comment-date text-gray-500 text-sm block ">{{ comment.created_at }}</span>
+                {% if comment.user == request.user or request.user.is_staff %}
+                    <form action="{% url 'film:delete_comment' comment.id %}" method="POST" class="inline-block ml-4 ">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-600">Delete</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li class="comment-item text-lg mb-2">No comments yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+    </div>
+    <script src="{% static 'movie.js' %}"></script>
+</main>
+</body>
+</html>
